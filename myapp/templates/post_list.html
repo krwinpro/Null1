@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}게시판 - NULLCRYPT{% endblock %}
+{% block content %}
+    <h1 class="text-3xl text-neon-green mb-4">게시판</h1>
+    
+    <div class="mb-4">
+        <h2 class="text-xl text-neon-green">공지사항</h2>
+        {% for announcement in announcements %}
+            <div class="bg-gray-800 p-4 mb-2 rounded">
+                <h3 class="text-lg text-neon-pink">{{ announcement.title }}</h3>
+                <p>{{ announcement.content }}</p>
+                <p class="text-sm text-gray-400">작성자: {{ announcement.author }} | {{ announcement.created_at }}</p>
+            </div>
+        {% empty %}
+            <p class="text-gray-400">공지사항이 없습니다.</p>
+        {% endfor %}
+    </div>
+    
+    <div class="mb-4">
+        <h2 class="text-xl text-neon-green">카테고리</h2>
+        <div class="flex space-x-4 mb-4">
+            <a href="{% url 'post_list' %}" class="text-neon-green hover:text-neon-pink {% if not category %}font-bold{% endif %}">전체</a>
+            {% for cat in categories %}
+                <a href="{% url 'post_list' category_slug=cat.slug %}" 
+                   class="text-neon-green hover:text-neon-pink {% if category and category.slug == cat.slug %}font-bold{% endif %}">
+                   {{ cat.name }}
+                </a>
+            {% endfor %}
+        </div>
+        
+        {% if user.is_authenticated %}
+            <div class="mb-4">
+                {% if category %}
+                    <a href="{% url 'post_create' category_slug=category.slug %}" 
+                       class="bg-neon-green text-black px-4 py-2 rounded hover:bg-neon-pink">
+                       {{ category.name }}에 글쓰기
+                    </a>
+                {% endif %}
+                <a href="{% url 'post_create_general' %}" 
+                   class="bg-neon-blue text-black px-4 py-2 rounded hover:bg-neon-pink ml-2">
+                   일반 글쓰기
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div>
+        <h2 class="text-xl text-neon-green">게시물</h2>
+        {% for post in posts %}
+            <div class="bg-gray-800 p-4 mb-2 rounded">
+                <h3 class="text-lg text-neon-pink">
+                    <a href="{% url 'post_detail' post_id=post.id %}" class="hover:text-neon-green transition-colors">
+                        {{ post.title }}
+                    </a>
+                    {% if post.is_pinned %}
+                        <span class="text-neon-green text-sm">[고정]</span>
+                    {% endif %}
+                </h3>
+                <p class="mb-2">{{ post.content|truncatewords:30 }}</p>
+                {% if post.file %}
+                    <div class="mb-2">
+                        <a href="{{ post.file.url }}" class="text-neon-green hover:text-neon-pink">
+                            📎 파일 다운로드
+                        </a>
+                    </div>
+                {% endif %}
+                <p class="text-sm text-gray-400">
+                    작성자: {{ post.author.username }} | 
+                    {{ post.created_at|date:"Y-m-d H:i" }} | 
+                    카테고리: {{ post.category.name }}
+                </p>
+            </div>
+        {% empty %}
+            <p class="text-gray-400">게시물이 없습니다.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

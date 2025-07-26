@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}홈 - NULLCRYPT{% endblock %}
+{% block content %}
+    <h1 class="text-3xl text-neon-green mb-4">NULLCRYPT</h1>
+    <div class="mb-4">
+        <h2 class="text-xl text-neon-green">공지사항</h2>
+        {% for announcement in announcements %}
+            <div class="bg-gray-800 p-4 mb-2 rounded">
+                <h3 class="text-lg text-neon-pink">{{ announcement.title }}</h3>
+                <p>{{ announcement.content }}</p>
+                <p class="text-sm text-gray-400">작성자: {{ announcement.author }} | {{ announcement.created_at }}</p>
+            </div>
+        {% endfor %}
+    </div>
+    <div>
+        <h2 class="text-xl text-neon-green">카테고리</h2>
+        <div class="flex space-x-4">
+            {% for category in categories %}
+                <a href="{% url 'post_list' category_slug=category.slug %}" class="text-neon-green hover:text-neon-pink">{{ category.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

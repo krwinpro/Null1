@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NULLCRYPT{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom neon colors */
+        .text-neon-green { color: #00ff41; }
+        .text-neon-pink { color: #ff0080; }
+        .text-neon-blue { color: #0080ff; }
+        .text-neon-red { color: #ff4040; }
+        .bg-neon-green { background-color: #00ff41; }
+        .bg-neon-pink { background-color: #ff0080; }
+        .bg-neon-blue { background-color: #0080ff; }
+        .bg-neon-red { background-color: #ff4040; }
+        
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* Glowing effect for neon text */
+        .text-neon-green {
+            text-shadow: 0 0 10px #00ff41;
+        }
+        .text-neon-pink {
+            text-shadow: 0 0 10px #ff0080;
+        }
+        .text-neon-blue {
+            text-shadow: 0 0 10px #0080ff;
+        }
+        
+        /* Form styling */
+        input, textarea, select {
+            background-color: #2d2d2d !important;
+            border: 1px solid #00ff41;
+            color: #ffffff !important;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #ff0080;
+            box-shadow: 0 0 5px #ff0080;
+        }
+        
+        /* Button hover effects */
+        button:hover {
+            box-shadow: 0 0 10px currentColor;
+        }
+        
+        /* Table styling */
+        table {
+            border: 1px solid #00ff41;
+        }
+        
+        th, td {
+            border-bottom: 1px solid #333;
+        }
+        
+        /* Link styling */
+        a {
+            transition: all 0.3s ease;
+        }
+        
+        a:hover {
+            text-shadow: 0 0 5px currentColor;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <header class="bg-black border-b border-neon-green p-4">
+        <nav class="container mx-auto flex justify-between items-center">
+            <a href="{% url 'home' %}" class="text-2xl font-bold text-neon-green">NULLCRYPT</a>
+            <div class="space-x-4">
+                {% if user.is_authenticated %}
+                    <span class="text-neon-blue">환영합니다, {{ user.username }}님</span>
+                    {% if user.is_staff %}
+                        <a href="/whereisadminssite-dgdb-1111/" class="text-neon-pink hover:text-neon-green" target="_blank">관리자</a>
+                    {% endif %}
+                    <a href="{% url 'post_list' %}" class="text-neon-green hover:text-neon-pink">게시판</a>
+                    <a href="{% url 'post_create_general' %}" class="text-neon-green hover:text-neon-pink">글쓰기</a>
+                    <a href="{% url 'logout' %}" 
+                       class="text-neon-red hover:text-neon-pink"
+                       onclick="return confirm('정말 로그아웃 하시겠습니까?')">
+                       로그아웃
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-neon-green hover:text-neon-pink">로그인</a>
+                    <a href="{% url 'register' %}" class="text-neon-green hover:text-neon-pink">회원가입</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 flex-grow">
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} bg-gray-800 border border-neon-blue p-3 rounded mb-2">
+                        <span class="text-neon-blue">{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-black border-t border-neon-green p-4 mt-8">
+        <div class="container mx-auto text-center">
+            <p class="text-neon-green">&copy; 2025 NULLCRYPT. All rights reserved.</p>
+            <p class="text-sm text-gray-400 mt-2">Stay anonymous, stay safe.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add glitch effect to title
+            const title = document.querySelector('h1');
+            if (title) {
+                setInterval(() => {
+                    title.style.textShadow = Math.random() > 0.5 ? 
+                        '2px 0 #ff0080, -2px 0 #00ff41' : 
+                        '0 0 10px currentColor';
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>

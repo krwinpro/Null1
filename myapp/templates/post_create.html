@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% block title %}
+    {% if is_general %}
+        글쓰기 - NULLCRYPT
+    {% else %}
+        {{ category.name }} 글쓰기 - NULLCRYPT
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <div class="bg-gray-900 border border-gray-600 p-4">
+        <h1 class="text-xl text-white mb-4">
+            {% if is_general %}
+                글쓰기
+            {% else %}
+                {{ category.name }} 글쓰기
+            {% endif %}
+        </h1>
+        
+        <form method="post" enctype="multipart/form-data" id="postForm">
+            {% csrf_token %}
+            
+            <!-- 제목 -->
+            <div class="mb-4">
+                <label class="block text-green-400 text-sm mb-1">제목</label>
+                <input type="text" name="title" 
+                       class="w-full bg-black border border-gray-600 text-white p-2 text-sm"
+                       value="{{ form.title.value|default:'' }}" required>
+                {% if form.title.errors %}
+                    <div class="text-red-400 text-xs mt-1">{{ form.title.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            <!-- 카테고리 (일반 글쓰기인 경우) -->
+            {% if is_general %}
+            <div class="mb-4">
+                <label class="block text-green-400 text-sm mb-1">카테고리</label>
+                <select name="category" 
+                        class="w-full bg-black border border-gray-600 text-white p-2 text-sm" required>
+                    <option value="">선택하세요</option>
+                    {% for category in form.category.field.queryset %}
+                        <option value="{{ category.id }}" 
+                                {% if form.category.value == category.id|stringformat:"s" %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                {% if form.category.errors %}
+                    <div class="text-red-400 text-xs mt-1">{{ form.category.errors.0 }}</div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- 내용 -->
+            <div class="mb-4">
+                <label class="block text-green-400 text-sm mb-1">내용</label>
+                <textarea name="content" rows="20" 
+                          class="w-full bg-black border border-gray-600 text-white p-2 text-sm font-mono"
+                          placeholder="내용을 입력하세요..."
+                          required>{{ form.content.value|default:'' }}</textarea>
+                {% if form.content.errors %}
+                    <div class="text-red-400 text-xs mt-1">{{ form.content.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            <!-- 파일 첨부 -->
+            <div class="mb-4">
+                <label class="block text-green-400 text-sm mb-1">파일 첨부</label>
+                <input type="file" name="files" multiple
+                       class="w-full bg-black border border-gray-600 text-white p-2 text-sm"
+                       id="fileInput">
+                <div class="text-gray-400 text-xs mt-2">
+                    여러 파일 선택 가능 | Ctrl+클릭으로 다중 선택
+                </div>
+                
+                <!-- 선택된 파일 미리보기 -->
+                <div id="filePreview" class="mt-2"></div>
+                
+                {% if form.files.errors %}
+                    <div class="text-red-400 text-xs mt-1">{{ form.files.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            <!-- 버튼 -->
+            <div class="flex space-x-2">
+                <button type="submit" 
+                        class="bg-gray-700 text-white px-6 py-2 text-sm border border-gray-600 hover:bg-gray-600"
+                        id="submitBtn">
+                    작성
+                </button>
+                <a href="{% url 'post_list' %}" 
+                   class="bg-gray-800 text-white px-6 py-2 text-sm border border-gray-600 hover:bg-gray-700 inline-block">
+                    취소
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <style>
+        input, textarea, select {
+            font-family: 'Courier New', monospace;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4ade80;
+        }
+
+        input[type="file"] {
+            color: #9ca3af;
+        }
+        
+        .file-item {
+            background: #1f2937;
+            border: 1px solid #374151;
+            padding: 6px;
+            margin: 2px 0;
+            border-radius: 2px;
+            font-size: 12px;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('fileInput');
+            const filePreview = document.getElementById('filePreview');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            fileInput.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+                filePreview.innerHTML = '';
+                
+                if (files.length === 0) {
+                    submitBtn.textContent = '작성';
+                    return;
+                }
+                
+                // 파일 목록 표시
+                const header = document.createElement('div');
+                header.className = 'text-gray-400 text-xs mb-2';
+                header.textContent = `선택된 파일: ${files.length}개`;
+                filePreview.appendChild(header);
+                
+                files.forEach((file) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    
+                    const sizeStr = file.size < 1024 ? `${file.size}B` :
+                                   file.size < 1024*1024 ? `${(file.size/1024).toFixed(1)}KB` :
+                                   `${(file.size/(1024*1024)).toFixed(1)}MB`;
+                    
+                    fileItem.innerHTML = `
+                        <div class="flex justify-between">
+                            <span class="text-white">${file.name}</span>
+                            <span class="text-gray-400">${sizeStr}</span>
+                        </div>
+                    `;
+                    
+                    filePreview.appendChild(fileItem);
+                });
+                
+                // 버튼 텍스트 업데이트
+                submitBtn.textContent = `작성 (${files.length}개 파일)`;
+            });
+        });
+    </script>
+{% endblock %}

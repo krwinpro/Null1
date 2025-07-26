@@ -1,0 +1,24 @@
+/* myapp/static/css/style.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --neon-green: #00ff00;
+    --neon-pink: #ff00ff;
+    --neon-blue: #00ffff;
+    --neon-red: #ff0000;
+}
+
+body {
+    background-color: #000;
+    color: var(--neon-green);
+}
+
+a {
+    color: var(--neon-pink);
+}
+
+a:hover {
+    color: var(--neon-blue);
+}

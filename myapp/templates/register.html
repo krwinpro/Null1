@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Access - NULLCRYPT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400&display=swap');
+        
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 50%, #0c0c0c 100%);
+            overflow-x: hidden;
+        }
+        
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+        
+        .neon-green { color: #00ff41; }
+        .neon-red { color: #ff0040; }
+        .neon-blue { color: #0080ff; }
+        .neon-pink { color: #ff0080; }
+        
+        .glow-green {
+            text-shadow: 0 0 5px #00ff41, 0 0 10px #00ff41, 0 0 15px #00ff41;
+        }
+        
+        .terminal-box {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff41;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 65, 0.3),
+                inset 0 0 20px rgba(0, 255, 65, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .input-field {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            border-color: #ff0080;
+            box-shadow: 0 0 10px rgba(255, 0, 128, 0.5);
+            outline: none;
+        }
+        
+        .btn-register {
+            background: linear-gradient(45deg, #0080ff, #0066cc);
+            color: #fff;
+            border: none;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        .btn-register:hover {
+            background: linear-gradient(45deg, #00ff41, #00cc33);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.6);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center text-green-400 py-8">
+    <canvas class="matrix-bg" id="matrix"></canvas>
+    
+    <div class="terminal-box p-8 rounded-lg max-w-md w-full mx-4">
+        <!-- Terminal Header -->
+        <div class="text-center mb-8">
+            <div class="text-2xl font-bold neon-green glow-green mb-2">
+                ◢◤ ACCESS REGISTRATION ◥◣
+            </div>
+            <div class="text-sm neon-blue mb-4">
+                CREATE NEW TERMINAL ACCESS
+            </div>
+            <div class="text-xs neon-red">
+                ⚠ ALL ACTIVITIES ARE MONITORED ⚠
+            </div>
+        </div>
+        
+        <!-- Registration Form -->
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                        <div class="text-neon-red text-sm p-2 border border-red-500 rounded bg-red-900 bg-opacity-20">
+                            ⚠ {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <div>
+                <label class="block text-neon-green text-sm mb-2">
+                    > USERNAME:
+                </label>
+                <input 
+                    type="text" 
+                    name="username" 
+                    class="input-field w-full p-3 rounded font-mono"
+                    placeholder="Enter unique identifier..."
+                    required
+                    value="{{ form.username.value|default:'' }}"
+                >
+                {% if form.username.errors %}
+                    <div class="text-neon-red text-xs mt-1">{{ form.username.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            <div>
+                <label class="block text-neon-green text-sm mb-2">
+                    > EMAIL:
+                </label>
+                <input 
+                    type="email" 
+                    name="email" 
+                    class="input-field w-full p-3 rounded font-mono"
+                    placeholder="secure.contact@domain.onion"
+                    required
+                    value="{{ form.email.value|default:'' }}"
+                >
+                {% if form.email.errors %}
+                    <div class="text-neon-red text-xs mt-1">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            <div>
+                <label class="block text-neon-green text-sm mb-2">
+                    > PASSWORD:
+                </label>
+                <input 
+                    type="password" 
+                    name="password" 
+                    class="input-field w-full p-3 rounded font-mono"
+                    placeholder="Enter secure passphrase..."
+                    required
+                >
+                {% if form.password.errors %}
+                    <div class="text-neon-red text-xs mt-1">{{ form.password.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            <button 
+                type="submit" 
+                class="btn-register w-full p-3 rounded font-mono text-lg"
+            >
+                ◢ REGISTER ACCESS ◣
+            </button>
+        </form>
+        
+        <!-- Footer Links -->
+        <div class="mt-8 text-center space-y-2">
+            <div class="text-xs neon-blue">
+                ─────────────────────────────
+            </div>
+            <a href="{% url 'login' %}" class="block text-neon-pink hover:text-neon-green transition-colors text-sm">
+                > RETURN_TO_LOGIN_TERMINAL
+            </a>
+            <div class="text-xs neon-blue mt-4">
+                SECURITY_LEVEL: <span class="neon-green">MAXIMUM</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Matrix rain effect (same as login page)
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}";
+        const matrixArray = matrix.split("");
+        
+        const fontSize = 10;
+        const columns = canvas.width / fontSize;
+        
+        const drops = [];
+        for(let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+        
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px monospace';
+            
+            for(let i = 0; i < drops.length; i++) {
+                const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        setInterval(draw, 35);
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
